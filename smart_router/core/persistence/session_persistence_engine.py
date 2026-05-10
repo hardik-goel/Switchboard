@@ -35,6 +35,9 @@ class SessionPersistenceEngine:
     async def restore_session(self, session_id: str) -> SessionRecord | None:
         return await self._store.get_session(session_id)
 
+    async def list_sessions(self) -> list[SessionRecord]:
+        return await self._store.list_sessions()
+
     async def restore_transitions(self, session_id: str) -> list[StateTransitionRecord]:
         return await self._state_store.list(session_id)
 

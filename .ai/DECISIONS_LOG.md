@@ -133,3 +133,14 @@ Adds resumability and restart-safe continuity while preserving strict separation
 
 Impact:
 Execution sessions now survive interruption with persisted transitions/snapshots and can restore execution plans for recovery flows.
+
+### 2026-05-10: Production CLI remains orchestration-only with composed service bootstrap
+
+Decision:
+Implement CLI as thin composition/wiring layer (`cli/bootstrap.py`) with command modules delegating to analyzer/router/execution/orchestrator/session/telemetry primitives.
+
+Reason:
+Delivers usable end-to-end UX while preserving architecture boundaries and avoiding logic leakage into CLI.
+
+Impact:
+Local users can run prompts, interactive sessions, route explanations, resume sessions, inspect telemetry, validate config, and check provider health through one CLI surface.

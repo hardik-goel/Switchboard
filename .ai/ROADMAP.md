@@ -35,9 +35,13 @@
 ## Phase 7 — Stateful Execution
 
 1. Session persistence + continuity management
-2. Stream recovery polish
 
-## Phase 8 — Product Surface
+## Phase 8 — User Experience Layer
 
-1. CLI layer
-2. Integration layer
+1. Production CLI + end-to-end execution flow
+2. Streaming UX polish
+
+## Phase 9 — Final Integration
+
+1. Integration hardening
+2. Packaging/release polish

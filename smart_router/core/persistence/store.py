@@ -19,6 +19,9 @@ class SessionStore(Protocol):
     async def get_session(self, session_id: str) -> SessionRecord | None:
         ...
 
+    async def list_sessions(self) -> list[SessionRecord]:
+        ...
+
     async def append_transition(self, record: StateTransitionRecord) -> None:
         ...
 
@@ -45,6 +48,9 @@ class InMemorySessionStore:
 
     async def get_session(self, session_id: str) -> SessionRecord | None:
         return self._sessions.get(session_id)
+
+    async def list_sessions(self) -> list[SessionRecord]:
+        return list(self._sessions.values())
 
     async def append_transition(self, record: StateTransitionRecord) -> None:
         self._transitions.setdefault(record.session_id, []).append(record)
@@ -181,6 +187,34 @@ class SQLiteSessionStore:
             telemetry_references=json.loads(row[7]),
             metadata=json.loads(row[8]),
         )
+
+    async def list_sessions(self) -> list[SessionRecord]:
+        conn = sqlite3.connect(self._db_path)
+        try:
+            rows = conn.execute(
+                """
+                SELECT session_id, request_id, lifecycle_state, provider, model, retry_count,
+                       fallback_count, recovery_state, telemetry_refs_json, metadata_json
+                FROM sessions ORDER BY session_id ASC
+                """
+            ).fetchall()
+        finally:
+            conn.close()
+        return [
+            SessionRecord(
+                session_id=row[0],
+                request_id=row[1],
+                lifecycle_state=row[2],
+                provider=row[3],
+                model=row[4],
+                retry_count=int(row[5]),
+                fallback_count=int(row[6]),
+                recovery_state=row[7],
+                telemetry_references=json.loads(row[8]),
+                metadata=json.loads(row[9]),
+            )
+            for row in rows
+        ]
 
     async def append_transition(self, record: StateTransitionRecord) -> None:
         conn = sqlite3.connect(self._db_path)

@@ -15,12 +15,12 @@
 * [x] Execution integration
 * [x] Telemetry
 * [x] Session persistence
+* [x] Production CLI
 * [ ] Provider abstraction
 * [ ] Gemini provider
 * [ ] Ollama provider
-* [ ] Streaming engine
-* [ ] CLI layer
-* [ ] Integration layer
+* [ ] Streaming engine polish
+* [ ] Integration layer hardening
 
 ---
 
@@ -41,6 +41,7 @@ Provider abstraction
 ## Known Issues
 
 * Test execution blocked locally because `pytest` is not installed in `.venv`.
+* Import/runtime verification blocked locally because required dependencies (for example `pydantic`) are missing in `.venv`.
 
 ---
 

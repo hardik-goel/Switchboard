@@ -12,5 +12,5 @@ After completion:
 
 1. Create Gemini provider
 2. Create Ollama provider
-3. Add streaming engine polish and resume hooks
-4. Complete CLI/integration layer
+3. Streaming engine polish for richer CLI live UX
+4. Final integration hardening + packaging
