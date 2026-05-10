@@ -1,6 +1,9 @@
 providers:
   openai:
     enabled: true
+    settings:
+      timeout_seconds: 30
+      max_retries: 2
     models:
       - name: gpt-5.4
         max_input_tokens: 128000

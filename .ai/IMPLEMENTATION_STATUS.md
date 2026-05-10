@@ -7,8 +7,8 @@
 * [x] Create base schemas
 * [x] Config engine
 * [x] Provider registry
+* [x] OpenAI provider
 * [ ] Provider abstraction
-* [ ] OpenAI provider
 * [ ] Anthropic provider
 * [ ] Gemini provider
 * [ ] Ollama provider
@@ -32,14 +32,14 @@ Provider abstraction
 ## Pending Tasks
 
 * Implement provider abstraction base module
-* Implement OpenAI provider adapter
 * Implement Anthropic provider adapter
+* Implement Gemini provider adapter
 
 ---
 
 ## Known Issues
 
-* Local test execution still deferred by request.
+* Test execution blocked locally because `pytest` is not installed in `.venv`.
 
 ---
 

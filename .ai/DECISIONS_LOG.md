@@ -45,3 +45,14 @@ Avoids hidden dependencies and allows pluggable providers/future extensions with
 
 Impact:
 Provider orchestration can resolve adapters by provider name deterministically.
+
+### 2026-05-10: OpenAI provider is canonical adapter pattern
+
+Decision:
+Implement `smart_router/providers/openai` as the reference provider with strict isolation, typed config validation, typed exceptions, normalized streaming events, and retry-safe request handling.
+
+Reason:
+Future providers need a production-grade template that enforces abstraction boundaries and consistent behavior.
+
+Impact:
+Anthropic/Gemini/Ollama adapters can mirror the same architecture with minimal risk of interface drift.

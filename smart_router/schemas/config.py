@@ -22,6 +22,7 @@ class ProviderConfig(BaseModel):
 
     enabled: bool = True
     api_base: str | None = None
+    settings: dict[str, str | int | float | bool] = Field(default_factory=dict)
     models: list[ModelConfig] = Field(default_factory=list)
 
 

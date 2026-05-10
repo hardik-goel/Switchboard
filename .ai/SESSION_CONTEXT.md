@@ -2,15 +2,15 @@
 
 ## Current assumptions
 
-* Config-driven architecture remains source-of-truth from `.ai/ARCHITECTURE.md`.
-* Config engine and provider registry are now established.
-* Provider-specific implementations remain unimplemented.
+* OpenAI provider now exists as canonical provider implementation in `smart_router/providers/openai`.
+* Config engine and provider registry integration path is functional via `OpenAIProvider.from_config_engine` and `register_openai_provider`.
+* Future provider modules should mirror this contract and isolation pattern.
 
 ## Current blockers
 
-* Test execution remains deferred intentionally by user request.
+* Automated test execution is currently blocked by missing `pytest` in `.venv`.
 
 ## Temporary reasoning
 
-* Build order followed priority: config engine first, then provider registry for provider-agnostic instantiation.
-* Kept registry independent from provider internals via factory contract.
+* Implemented provider-agnostic stream event normalization while keeping the existing `ProviderAdapter.stream()` signature.
+* Kept all OpenAI-specific behavior inside adapter boundaries (no routing or CLI coupling).
