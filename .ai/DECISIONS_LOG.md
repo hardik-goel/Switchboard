@@ -111,3 +111,14 @@ Transforms routing outputs into executable plans while preserving clean router/o
 
 Impact:
 System now supports coordinated retry/fallback lifecycle with state tracking and failover context preservation without mutating routing logic.
+
+### 2026-05-10: Observability split into ingestion, storage abstraction, and analytics layers
+
+Decision:
+Implement passive telemetry as separate modules: `TelemetryManager` for ingestion, `TelemetryStorage` abstraction (`InMemory` + `SQLite`), metrics trackers, and `ExecutionAnalyticsEngine` aggregations.
+
+Reason:
+Prevents coupling telemetry with routing/execution control flow while enabling future telemetry-backed intelligence consumption.
+
+Impact:
+System now records operational signals and computes analytics (latency, cost, reliability, fallback/retry frequencies, degraded providers) without owning decisions.

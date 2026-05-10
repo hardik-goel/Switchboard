@@ -13,4 +13,4 @@ After completion:
 1. Create Gemini provider
 2. Create Ollama provider
 3. Add session persistence integration to execution lifecycle
-4. Add telemetry integration hooks
+4. Wire telemetry summaries into optional routing health inputs (read-only)

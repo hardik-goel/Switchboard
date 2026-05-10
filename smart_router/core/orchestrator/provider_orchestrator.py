@@ -6,11 +6,13 @@ import asyncio
 import logging
 import time
 import uuid
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Awaitable, Callable
+from typing import Any
 
 from smart_router.core.registry import ProviderRegistry, ProviderRegistryError
 from smart_router.core.runtime import RuntimeExecutionContext
 from smart_router.core.streaming import StreamEvent, StreamManager
+from smart_router.core.telemetry import maybe_emit
 
 from .exceptions import (
     ExecutionFailureError,
@@ -22,6 +24,7 @@ from .exceptions import (
 from .schemas import ExecutionRequest, ExecutionResult
 
 logger = logging.getLogger("smart_router.orchestrator")
+TelemetryHook = Callable[[dict[str, Any]], Awaitable[None] | None]
 
 
 class ProviderOrchestrator:
@@ -33,11 +36,13 @@ class ProviderOrchestrator:
         *,
         stream_manager: StreamManager | None = None,
         max_retries: int = 0,
+        telemetry_hook: TelemetryHook | None = None,
     ) -> None:
         self._registry = registry
         self._stream_manager = stream_manager or StreamManager()
         self._max_retries = max_retries
         self._cancellations: dict[str, RuntimeExecutionContext] = {}
+        self._telemetry_hook = telemetry_hook
 
     async def execute(self, request: ExecutionRequest) -> ExecutionResult:
         """Execute non-streaming provider request with retry-safe wrapper."""
@@ -63,6 +68,19 @@ class ProviderOrchestrator:
                     "stream_state": context.stream_state.last_event_type,
                 },
             )
+            await maybe_emit(
+                self._telemetry_hook,
+                {
+                    "event_type": "execution_completed",
+                    "request_id": context.request_id,
+                    "session_id": context.session_id,
+                    "provider": context.selected_provider,
+                    "model": context.selected_model,
+                    "latency": latency_ms,
+                    "retry_count": context.retry_count,
+                    "execution_state": "completed",
+                },
+            )
             return ExecutionResult(
                 request_id=context.request_id,
                 provider=context.selected_provider,
@@ -74,6 +92,19 @@ class ProviderOrchestrator:
         except RuntimeCancellationError:
             raise
         except Exception as exc:
+            await maybe_emit(
+                self._telemetry_hook,
+                {
+                    "event_type": "execution_failed",
+                    "request_id": context.request_id,
+                    "session_id": context.session_id,
+                    "provider": context.selected_provider,
+                    "model": context.selected_model,
+                    "retry_count": context.retry_count,
+                    "execution_state": "failed",
+                    "metadata": {"error": str(exc)},
+                },
+            )
             raise ExecutionFailureError(f"Provider execution failed: {exc}") from exc
         finally:
             self._cancellations.pop(context.request_id, None)
@@ -109,6 +140,19 @@ class ProviderOrchestrator:
                         "stream_state": event.stream_state,
                     },
                 )
+                if event.event_type == "stream_interrupted":
+                    await maybe_emit(
+                        self._telemetry_hook,
+                        {
+                            "event_type": "stream_interrupted",
+                            "request_id": context.request_id,
+                            "session_id": context.session_id,
+                            "provider": context.selected_provider,
+                            "model": context.selected_model,
+                            "retry_count": context.retry_count,
+                            "execution_state": event.stream_state,
+                        },
+                    )
                 yield event
         except RuntimeCancellationError:
             raise

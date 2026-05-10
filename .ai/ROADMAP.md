@@ -27,10 +27,13 @@
 ## Phase 5 — Execution Integration
 
 1. Route execution integration + retry/fallback engine
-2. Session persistence integration
-3. Telemetry integration hooks
 
-## Phase 6 — Product Surface
+## Phase 6 — Observability
+
+1. Telemetry + metrics + execution analytics
+2. Session persistence integration hooks
+
+## Phase 7 — Product Surface
 
 1. Streaming engine polish
 2. CLI layer

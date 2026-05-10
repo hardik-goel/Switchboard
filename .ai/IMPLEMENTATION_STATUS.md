@@ -13,10 +13,10 @@
 * [x] Prompt analyzer
 * [x] Routing engine
 * [x] Execution integration
+* [x] Telemetry
 * [ ] Provider abstraction
 * [ ] Gemini provider
 * [ ] Ollama provider
-* [ ] Telemetry
 * [ ] Session persistence
 * [ ] Streaming engine
 * [ ] CLI layer

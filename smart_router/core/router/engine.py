@@ -3,16 +3,20 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Awaitable, Callable
+from typing import Any
 
 from smart_router.core.policies.fallback_planner import Candidate, FallbackPlanner
 from smart_router.core.policies.routing_policy_evaluator import RoutingPolicyEvaluator
 from smart_router.core.router.schemas import ProviderHealthMetadata, RouterRuntimeContext
+from smart_router.core.telemetry import maybe_emit
 from smart_router.schemas.classification import PromptClassification
 from smart_router.schemas.config import AppConfig
 from smart_router.schemas.prompt import PromptRequest
 from smart_router.schemas.routing import RoutingDecision
 
 logger = logging.getLogger("smart_router.router.engine")
+TelemetryHook = Callable[[dict[str, Any]], Awaitable[None] | None]
 
 
 class RoutingEngine:
@@ -24,10 +28,12 @@ class RoutingEngine:
         *,
         policy_evaluator: RoutingPolicyEvaluator | None = None,
         fallback_planner: FallbackPlanner | None = None,
+        telemetry_hook: TelemetryHook | None = None,
     ) -> None:
         self._config = config
         self._policy = policy_evaluator or RoutingPolicyEvaluator()
         self._fallback = fallback_planner or FallbackPlanner()
+        self._telemetry_hook = telemetry_hook
 
     async def choose_route(
         self,
@@ -85,6 +91,21 @@ class RoutingEngine:
                 "estimated_cost": decision.estimated_cost,
                 "estimated_latency": decision.estimated_latency,
                 "fallback_count": len(decision.fallback_chain),
+            },
+        )
+        await maybe_emit(
+            self._telemetry_hook,
+            {
+                "event_type": "route_selected",
+                "request_id": context.request_id,
+                "session_id": context.session_id,
+                "provider": decision.selected_provider,
+                "model": decision.selected_model,
+                "latency": decision.estimated_latency,
+                "cost_estimate": decision.estimated_cost,
+                "fallback_count": len(decision.fallback_chain),
+                "execution_state": "selected",
+                "metadata": {"routing_confidence": decision.routing_confidence},
             },
         )
         return decision

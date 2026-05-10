@@ -5,6 +5,8 @@ from __future__ import annotations
 import asyncio
 import logging
 import time
+from collections.abc import Awaitable, Callable
+from typing import Any
 
 from smart_router.core.execution.route_execution_mapper import RouteExecutionMapper
 from smart_router.core.execution.schemas import ExecutionPlan, FinalExecutionOutcome, LifecycleSnapshot
@@ -15,8 +17,10 @@ from smart_router.core.orchestrator.schemas import ExecutionResult
 from smart_router.core.retries.failure_classifier import FailureClassifier
 from smart_router.core.retries.retry_engine import RetryEngine
 from smart_router.core.retries.retry_policy_evaluator import RetryPolicy
+from smart_router.core.telemetry import maybe_emit
 
 logger = logging.getLogger("smart_router.execution.lifecycle")
+TelemetryHook = Callable[[dict[str, Any]], Awaitable[None] | None]
 
 
 class ExecutionLifecycleManager:
@@ -31,11 +35,13 @@ class ExecutionLifecycleManager:
         fallback_manager: FallbackExecutionManager | None = None,
         failure_classifier: FailureClassifier | None = None,
         retry_policy: RetryPolicy | None = None,
+        telemetry_hook: TelemetryHook | None = None,
     ) -> None:
         self._orchestrator = orchestrator
         self._mapper = mapper or RouteExecutionMapper()
         self._retry_engine = retry_engine or RetryEngine()
-        self._fallback = fallback_manager or FallbackExecutionManager(self._mapper)
+        self._telemetry_hook = telemetry_hook
+        self._fallback = fallback_manager or FallbackExecutionManager(self._mapper, telemetry_hook=telemetry_hook)
         self._classifier = failure_classifier or FailureClassifier()
         self._retry_policy = retry_policy or RetryPolicy()
         self._cancelled: set[str] = set()
@@ -55,6 +61,19 @@ class ExecutionLifecycleManager:
 
         start = time.perf_counter()
         try:
+            await maybe_emit(
+                self._telemetry_hook,
+                {
+                    "event_type": "execution_started",
+                    "request_id": snapshot.request_id,
+                    "session_id": snapshot.session_id,
+                    "provider": snapshot.active_provider,
+                    "model": snapshot.active_model,
+                    "retry_count": snapshot.retry_count,
+                    "fallback_count": 0,
+                    "execution_state": snapshot.state,
+                },
+            )
             primary_request = self._mapper.to_execution_request(
                 plan,
                 provider=plan.primary_provider,
@@ -92,6 +111,22 @@ class ExecutionLifecycleManager:
             )
         finally:
             latency = int((time.perf_counter() - start) * 1000)
+            event_type = "execution_completed" if snapshot.state == "completed" else "execution_failed"
+            await maybe_emit(
+                self._telemetry_hook,
+                {
+                    "event_type": event_type,
+                    "request_id": snapshot.request_id,
+                    "session_id": snapshot.session_id,
+                    "provider": snapshot.active_provider,
+                    "model": snapshot.active_model,
+                    "latency": latency,
+                    "retry_count": snapshot.retry_count,
+                    "fallback_count": 1 if snapshot.fallback_provider else 0,
+                    "execution_state": snapshot.state,
+                    "metadata": {"failure_type": snapshot.failure_type},
+                },
+            )
             logger.info(
                 "execution_lifecycle_completed",
                 extra={
@@ -127,6 +162,13 @@ class ExecutionLifecycleManager:
                 policy=self._retry_policy,
                 on_retry=on_retry,
                 is_cancelled=is_cancelled,
+                telemetry_hook=self._telemetry_hook,
+                telemetry_base={
+                    "request_id": request.request_id,
+                    "session_id": request.session_id,
+                    "provider": request.provider,
+                    "model": request.model,
+                },
             )
             snapshot.state = "running"
             if isinstance(result, ExecutionResult):

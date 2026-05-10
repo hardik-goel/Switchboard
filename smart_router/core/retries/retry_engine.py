@@ -4,9 +4,13 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import Awaitable, Callable
+from typing import Any
 
 from smart_router.core.retries.failure_classifier import FailureClassification
 from smart_router.core.retries.retry_policy_evaluator import RetryPolicy, RetryPolicyEvaluator
+from smart_router.core.telemetry import maybe_emit
+
+TelemetryHook = Callable[[dict[str, Any]], Awaitable[None] | None]
 
 
 class RetryEngine:
@@ -23,6 +27,8 @@ class RetryEngine:
         policy: RetryPolicy,
         on_retry: Callable[[int, FailureClassification], Awaitable[None]] | None = None,
         is_cancelled: Callable[[], bool] | None = None,
+        telemetry_hook: TelemetryHook | None = None,
+        telemetry_base: dict[str, Any] | None = None,
     ) -> object:
         retry_count = 0
 
@@ -38,4 +44,13 @@ class RetryEngine:
                     raise
                 if on_retry is not None:
                     await on_retry(retry_count, failure)
+                payload = {
+                    "event_type": "retry_triggered",
+                    "retry_count": retry_count,
+                    "execution_state": "retrying",
+                    "metadata": {"failure_type": failure.failure_type},
+                }
+                if telemetry_base:
+                    payload.update(telemetry_base)
+                await maybe_emit(telemetry_hook, payload)
                 await asyncio.sleep(self._evaluator.backoff_seconds(retry_count=retry_count, policy=policy))

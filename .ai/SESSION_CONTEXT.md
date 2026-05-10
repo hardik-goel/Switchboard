@@ -2,9 +2,9 @@
 
 ## Current assumptions
 
-* Routing decisions are now executable through `ExecutionPlanner` + `RouteExecutionMapper`.
-* Retry/fallback lifecycle is coordinated by `ExecutionLifecycleManager` with provider-agnostic classification/policy components.
-* Orchestrator remains reusable and clean; retries/fallbacks are externalized.
+* Telemetry ingestion/storage/analytics stack is now present and passive.
+* Router/orchestrator/retry/fallback/execution modules expose optional telemetry hooks only.
+* No telemetry-driven routing behavior is enabled yet.
 
 ## Current blockers
 
@@ -12,5 +12,5 @@
 
 ## Temporary reasoning
 
-* Kept retry logic deterministic and policy-driven via `RetryPolicyEvaluator`.
-* Kept fallback transitions isolated in `FallbackExecutionManager` to avoid provider coupling.
+* Kept telemetry architecture separated into ingestion (`TelemetryManager`), persistence abstraction (`TelemetryStorage`), and aggregation (`ExecutionAnalyticsEngine`).
+* Avoided hard control coupling: telemetry observes lifecycle transitions but does not mutate routing/execution behavior.
