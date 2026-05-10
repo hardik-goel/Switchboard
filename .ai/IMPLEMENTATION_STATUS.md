@@ -8,6 +8,7 @@
 * [x] Config engine
 * [x] Provider registry
 * [x] OpenAI provider
+* [x] Provider orchestrator runtime pipeline
 * [ ] Provider abstraction
 * [ ] Anthropic provider
 * [ ] Gemini provider

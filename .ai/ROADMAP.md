@@ -16,19 +16,19 @@
 4. Gemini provider
 5. Ollama provider
 
-## Phase 3 — Routing Intelligence
+## Phase 3 — Runtime Execution
+
+1. Provider orchestrator + execution pipeline
+2. Retry/fallback engine integration
+3. Session/telemetry integration hooks
+
+## Phase 4 — Routing Intelligence
 
 1. Prompt classifier
 2. Routing engine
-3. Retry/fallback engine
-
-## Phase 4 — Runtime Systems
-
-1. Streaming engine
-2. Session persistence
-3. Telemetry
 
 ## Phase 5 — Product Surface
 
-1. CLI layer
-2. Integration layer
+1. Streaming engine polish
+2. CLI layer
+3. Integration layer

@@ -56,3 +56,14 @@ Future providers need a production-grade template that enforces abstraction boun
 
 Impact:
 Anthropic/Gemini/Ollama adapters can mirror the same architecture with minimal risk of interface drift.
+
+### 2026-05-10: Runtime orchestration is split across orchestrator/runtime/streaming modules
+
+Decision:
+Implement runtime execution as three focused layers: `RuntimeExecutionContext` for execution state, `ProviderOrchestrator` for lifecycle + provider invocation, and `StreamManager` for provider-agnostic stream normalization.
+
+Reason:
+Keeps responsibilities isolated, avoids routing leakage, and enables future telemetry/session/retry integration without redesign.
+
+Impact:
+Execution pipeline is now a stable foundation that can consume routing decisions later while remaining provider-agnostic.
