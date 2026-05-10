@@ -12,13 +12,13 @@
 * [x] Provider orchestrator runtime pipeline
 * [x] Prompt analyzer
 * [x] Routing engine
+* [x] Execution integration
 * [ ] Provider abstraction
 * [ ] Gemini provider
 * [ ] Ollama provider
 * [ ] Telemetry
 * [ ] Session persistence
 * [ ] Streaming engine
-* [ ] Retry/fallback engine
 * [ ] CLI layer
 * [ ] Integration layer
 

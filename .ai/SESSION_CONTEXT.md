@@ -2,9 +2,9 @@
 
 ## Current assumptions
 
-* Routing engine now consumes only `PromptClassification` + config/runtime metadata and emits structured `RoutingDecision`.
-* Routing policies are deterministic, config-driven, and provider-SDK agnostic.
-* Analyzer, router, and orchestrator remain separated by explicit schemas/contracts.
+* Routing decisions are now executable through `ExecutionPlanner` + `RouteExecutionMapper`.
+* Retry/fallback lifecycle is coordinated by `ExecutionLifecycleManager` with provider-agnostic classification/policy components.
+* Orchestrator remains reusable and clean; retries/fallbacks are externalized.
 
 ## Current blockers
 
@@ -12,5 +12,5 @@
 
 ## Temporary reasoning
 
-* Implemented policy layer composition (`capability`, `cost`, `latency`, `health`) for explainable deterministic scoring.
-* Added fallback planning from ranked candidates without hardcoding provider names in routing logic.
+* Kept retry logic deterministic and policy-driven via `RetryPolicyEvaluator`.
+* Kept fallback transitions isolated in `FallbackExecutionManager` to avoid provider coupling.

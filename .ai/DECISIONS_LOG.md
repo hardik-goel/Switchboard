@@ -100,3 +100,14 @@ Ensures routing remains deterministic, explainable, observable, config-driven, a
 
 Impact:
 Routing decisions are now structured and execution-ready (`RoutingDecision`) with confidence, cost/latency estimates, and fallback chains.
+
+### 2026-05-10: Execution integration externalizes retries and fallbacks from orchestrator/providers
+
+Decision:
+Introduce `ExecutionPlanner`, `RouteExecutionMapper`, `RetryEngine`, `FailureClassifier`, `RetryPolicyEvaluator`, `FallbackExecutionManager`, and `ExecutionLifecycleManager` as provider-agnostic coordination layers.
+
+Reason:
+Transforms routing outputs into executable plans while preserving clean router/orchestrator/provider boundaries and deterministic retry/failover behavior.
+
+Impact:
+System now supports coordinated retry/fallback lifecycle with state tracking and failover context preservation without mutating routing logic.

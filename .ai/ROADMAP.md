@@ -23,13 +23,12 @@
 ## Phase 4 — Routing Intelligence
 
 1. Routing engine + policy system
-2. Router-to-orchestrator execution request mapping integration
 
-## Phase 5 — Runtime Execution
+## Phase 5 — Execution Integration
 
-1. Provider orchestrator + execution pipeline
-2. Retry/fallback engine integration
-3. Session/telemetry integration hooks
+1. Route execution integration + retry/fallback engine
+2. Session persistence integration
+3. Telemetry integration hooks
 
 ## Phase 6 — Product Surface
 
