@@ -2,9 +2,9 @@
 
 ## Current assumptions
 
-* Anthropic provider is now implemented and follows the same abstraction/runtime contract as OpenAI.
-* Runtime orchestrator + stream manager remain provider-agnostic with both OpenAI and Anthropic adapters.
-* Provider-specific semantics are isolated within each provider module.
+* Prompt analyzer + deterministic classifier stack is now implemented in `core/analyzer` and `core/classifier`.
+* Analyzer outputs are provider-agnostic and routing-ready via structured `PromptClassification` schema.
+* Runtime/orchestration modules remain decoupled from analysis logic.
 
 ## Current blockers
 
@@ -12,5 +12,5 @@
 
 ## Temporary reasoning
 
-* Anthropic stream output is normalized to the same provider-agnostic chunk format consumed by `StreamManager`.
-* Added tool-use preparation hook surface inside Anthropic adapter without leaking semantics into core runtime modules.
+* Kept heuristics deterministic and modular for future ML-pluggable classifier replacement.
+* Preserved strict separation: analyzer performs semantic intelligence only, with no routing/provider/pricing logic.

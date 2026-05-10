@@ -10,11 +10,11 @@
 * [x] OpenAI provider
 * [x] Anthropic provider
 * [x] Provider orchestrator runtime pipeline
+* [x] Prompt analyzer
 * [ ] Provider abstraction
 * [ ] Gemini provider
 * [ ] Ollama provider
 * [ ] Routing engine
-* [ ] Prompt classifier
 * [ ] Telemetry
 * [ ] Session persistence
 * [ ] Streaming engine

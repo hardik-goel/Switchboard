@@ -16,10 +16,19 @@ def test_prompt_request_requires_prompt() -> None:
 def test_classification_score_bounds() -> None:
     with pytest.raises(ValidationError):
         PromptClassification(
+            complexity_level="medium",
             complexity_score=1.5,
+            reasoning_depth="high",
             estimated_input_tokens=10,
             estimated_output_tokens=20,
-            reasoning_depth="high",
+            estimated_total_tokens=30,
+            context_expansion_tokens=2,
+            repo_scope="multi_file",
+            latency_sensitivity="low",
+            task_type="refactor",
+            confidence_score=0.6,
+            suggested_capabilities=["code_editing"],
+            execution_risk_level="medium",
         )
 
 

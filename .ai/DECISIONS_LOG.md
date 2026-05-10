@@ -78,3 +78,14 @@ Stress-test that provider abstraction and runtime execution are truly provider-a
 
 Impact:
 Orchestrator and StreamManager can execute Anthropic flows without any core-layer changes, confirming abstraction integrity.
+
+### 2026-05-10: Prompt analysis uses deterministic modular heuristic components
+
+Decision:
+Implement analysis as modular heuristics (`TaskTypeDetector`, `RepoScopeAnalyzer`, `ComplexityClassifier`, `TokenEstimator`, `LatencySensitivityAnalyzer`) orchestrated by `PromptAnalyzer`.
+
+Reason:
+Provides explainable, provider-agnostic, routing-agnostic intelligence now while keeping a clean seam for future ML classifier pluggability.
+
+Impact:
+Routing engine can consume structured `PromptClassification` directly without parsing raw prompts.
