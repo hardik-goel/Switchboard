@@ -2,9 +2,9 @@
 
 ## Current assumptions
 
-* Runtime execution foundation is now present in `core/orchestrator`, `core/runtime`, and `core/streaming`.
-* Orchestrator executes provider decisions from registry and does not include routing logic.
-* Stream lifecycle is normalized into provider-agnostic events.
+* Anthropic provider is now implemented and follows the same abstraction/runtime contract as OpenAI.
+* Runtime orchestrator + stream manager remain provider-agnostic with both OpenAI and Anthropic adapters.
+* Provider-specific semantics are isolated within each provider module.
 
 ## Current blockers
 
@@ -12,5 +12,5 @@
 
 ## Temporary reasoning
 
-* Added cancellable runtime context and timeout-aware stream pipeline for future routing/session/telemetry integration.
-* Preserved provider abstraction: orchestrator uses registry + provider interface only.
+* Anthropic stream output is normalized to the same provider-agnostic chunk format consumed by `StreamManager`.
+* Added tool-use preparation hook surface inside Anthropic adapter without leaking semantics into core runtime modules.

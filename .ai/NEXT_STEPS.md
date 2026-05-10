@@ -10,7 +10,7 @@ Print on console, module <functionality> completed along with stars below
 
 After completion:
 
-1. Create Anthropic provider
-2. Create Gemini provider
-3. Create Ollama provider
-4. Create routing engine
+1. Create Gemini provider
+2. Create Ollama provider
+3. Create routing engine
+4. Create prompt classifier

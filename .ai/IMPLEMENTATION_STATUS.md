@@ -8,9 +8,9 @@
 * [x] Config engine
 * [x] Provider registry
 * [x] OpenAI provider
+* [x] Anthropic provider
 * [x] Provider orchestrator runtime pipeline
 * [ ] Provider abstraction
-* [ ] Anthropic provider
 * [ ] Gemini provider
 * [ ] Ollama provider
 * [ ] Routing engine
@@ -33,8 +33,8 @@ Provider abstraction
 ## Pending Tasks
 
 * Implement provider abstraction base module
-* Implement Anthropic provider adapter
 * Implement Gemini provider adapter
+* Implement Ollama provider adapter
 
 ---
 

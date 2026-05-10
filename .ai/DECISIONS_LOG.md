@@ -67,3 +67,14 @@ Keeps responsibilities isolated, avoids routing leakage, and enables future tele
 
 Impact:
 Execution pipeline is now a stable foundation that can consume routing decisions later while remaining provider-agnostic.
+
+### 2026-05-10: Anthropic provider validated abstraction heterogeneity
+
+Decision:
+Implement `smart_router/providers/anthropic` with Anthropic-specific request/response/stream semantics, typed errors, env/config validation, and runtime-compatible normalized stream chunks.
+
+Reason:
+Stress-test that provider abstraction and runtime execution are truly provider-agnostic rather than OpenAI-shaped.
+
+Impact:
+Orchestrator and StreamManager can execute Anthropic flows without any core-layer changes, confirming abstraction integrity.
