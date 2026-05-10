@@ -14,10 +14,10 @@
 * [x] Routing engine
 * [x] Execution integration
 * [x] Telemetry
+* [x] Session persistence
 * [ ] Provider abstraction
 * [ ] Gemini provider
 * [ ] Ollama provider
-* [ ] Session persistence
 * [ ] Streaming engine
 * [ ] CLI layer
 * [ ] Integration layer

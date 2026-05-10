@@ -14,6 +14,7 @@ from smart_router.core.fallbacks.fallback_execution_manager import FallbackExecu
 from smart_router.core.orchestrator import ProviderOrchestrator
 from smart_router.core.orchestrator.exceptions import ExecutionFailureError
 from smart_router.core.orchestrator.schemas import ExecutionResult
+from smart_router.core.persistence import maybe_persist
 from smart_router.core.retries.failure_classifier import FailureClassifier
 from smart_router.core.retries.retry_engine import RetryEngine
 from smart_router.core.retries.retry_policy_evaluator import RetryPolicy
@@ -21,6 +22,7 @@ from smart_router.core.telemetry import maybe_emit
 
 logger = logging.getLogger("smart_router.execution.lifecycle")
 TelemetryHook = Callable[[dict[str, Any]], Awaitable[None] | None]
+PersistenceHook = Callable[[dict[str, Any]], Awaitable[None] | None]
 
 
 class ExecutionLifecycleManager:
@@ -36,12 +38,18 @@ class ExecutionLifecycleManager:
         failure_classifier: FailureClassifier | None = None,
         retry_policy: RetryPolicy | None = None,
         telemetry_hook: TelemetryHook | None = None,
+        persistence_hook: PersistenceHook | None = None,
     ) -> None:
         self._orchestrator = orchestrator
         self._mapper = mapper or RouteExecutionMapper()
         self._retry_engine = retry_engine or RetryEngine()
         self._telemetry_hook = telemetry_hook
-        self._fallback = fallback_manager or FallbackExecutionManager(self._mapper, telemetry_hook=telemetry_hook)
+        self._persistence_hook = persistence_hook
+        self._fallback = fallback_manager or FallbackExecutionManager(
+            self._mapper,
+            telemetry_hook=telemetry_hook,
+            persistence_hook=persistence_hook,
+        )
         self._classifier = failure_classifier or FailureClassifier()
         self._retry_policy = retry_policy or RetryPolicy()
         self._cancelled: set[str] = set()
@@ -72,6 +80,20 @@ class ExecutionLifecycleManager:
                     "retry_count": snapshot.retry_count,
                     "fallback_count": 0,
                     "execution_state": snapshot.state,
+                },
+            )
+            await maybe_persist(
+                self._persistence_hook,
+                {
+                    "event_type": "execution_started",
+                    "request_id": snapshot.request_id,
+                    "session_id": snapshot.session_id,
+                    "provider": snapshot.active_provider,
+                    "model": snapshot.active_model,
+                    "retry_count": snapshot.retry_count,
+                    "fallback_count": 0,
+                    "execution_state": "execution_running",
+                    "metadata": {"plan": plan.model_dump()},
                 },
             )
             primary_request = self._mapper.to_execution_request(
@@ -127,6 +149,21 @@ class ExecutionLifecycleManager:
                     "metadata": {"failure_type": snapshot.failure_type},
                 },
             )
+            await maybe_persist(
+                self._persistence_hook,
+                {
+                    "event_type": event_type,
+                    "request_id": snapshot.request_id,
+                    "session_id": snapshot.session_id,
+                    "provider": snapshot.active_provider,
+                    "model": snapshot.active_model,
+                    "latency": latency,
+                    "retry_count": snapshot.retry_count,
+                    "fallback_count": 1 if snapshot.fallback_provider else 0,
+                    "execution_state": snapshot.state,
+                    "metadata": {"failure_type": snapshot.failure_type, "fallback_provider": snapshot.fallback_provider},
+                },
+            )
             logger.info(
                 "execution_lifecycle_completed",
                 extra={
@@ -163,6 +200,7 @@ class ExecutionLifecycleManager:
                 on_retry=on_retry,
                 is_cancelled=is_cancelled,
                 telemetry_hook=self._telemetry_hook,
+                persistence_hook=self._persistence_hook,
                 telemetry_base={
                     "request_id": request.request_id,
                     "session_id": request.session_id,

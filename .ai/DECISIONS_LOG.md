@@ -122,3 +122,14 @@ Prevents coupling telemetry with routing/execution control flow while enabling f
 
 Impact:
 System now records operational signals and computes analytics (latency, cost, reliability, fallback/retry frequencies, degraded providers) without owning decisions.
+
+### 2026-05-10: Stateful execution uses hook-based persistence with recoverable snapshots
+
+Decision:
+Implement `SessionStore` abstraction, `SessionPersistenceEngine`, `SessionManager`, `SessionLifecycleManager`, `ExecutionStateStore`, `ContextSnapshotManager`, and `RecoveryCoordinator`; integrate via optional persistence hooks from lifecycle/retry/fallback/orchestrator/telemetry modules.
+
+Reason:
+Adds resumability and restart-safe continuity while preserving strict separation of concerns (sessions observe and persist state, but do not own routing/retry/provider logic).
+
+Impact:
+Execution sessions now survive interruption with persisted transitions/snapshots and can restore execution plans for recovery flows.

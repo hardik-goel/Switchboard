@@ -13,6 +13,7 @@ from smart_router.core.registry import ProviderRegistry, ProviderRegistryError
 from smart_router.core.runtime import RuntimeExecutionContext
 from smart_router.core.streaming import StreamEvent, StreamManager
 from smart_router.core.telemetry import maybe_emit
+from smart_router.core.persistence import maybe_persist
 
 from .exceptions import (
     ExecutionFailureError,
@@ -25,6 +26,7 @@ from .schemas import ExecutionRequest, ExecutionResult
 
 logger = logging.getLogger("smart_router.orchestrator")
 TelemetryHook = Callable[[dict[str, Any]], Awaitable[None] | None]
+PersistenceHook = Callable[[dict[str, Any]], Awaitable[None] | None]
 
 
 class ProviderOrchestrator:
@@ -37,12 +39,14 @@ class ProviderOrchestrator:
         stream_manager: StreamManager | None = None,
         max_retries: int = 0,
         telemetry_hook: TelemetryHook | None = None,
+        persistence_hook: PersistenceHook | None = None,
     ) -> None:
         self._registry = registry
         self._stream_manager = stream_manager or StreamManager()
         self._max_retries = max_retries
         self._cancellations: dict[str, RuntimeExecutionContext] = {}
         self._telemetry_hook = telemetry_hook
+        self._persistence_hook = persistence_hook
 
     async def execute(self, request: ExecutionRequest) -> ExecutionResult:
         """Execute non-streaming provider request with retry-safe wrapper."""
@@ -81,6 +85,19 @@ class ProviderOrchestrator:
                     "execution_state": "completed",
                 },
             )
+            await maybe_persist(
+                self._persistence_hook,
+                {
+                    "event_type": "execution_completed",
+                    "request_id": context.request_id,
+                    "session_id": context.session_id,
+                    "provider": context.selected_provider,
+                    "model": context.selected_model,
+                    "latency": latency_ms,
+                    "retry_count": context.retry_count,
+                    "execution_state": "completed",
+                },
+            )
             return ExecutionResult(
                 request_id=context.request_id,
                 provider=context.selected_provider,
@@ -94,6 +111,19 @@ class ProviderOrchestrator:
         except Exception as exc:
             await maybe_emit(
                 self._telemetry_hook,
+                {
+                    "event_type": "execution_failed",
+                    "request_id": context.request_id,
+                    "session_id": context.session_id,
+                    "provider": context.selected_provider,
+                    "model": context.selected_model,
+                    "retry_count": context.retry_count,
+                    "execution_state": "failed",
+                    "metadata": {"error": str(exc)},
+                },
+            )
+            await maybe_persist(
+                self._persistence_hook,
                 {
                     "event_type": "execution_failed",
                     "request_id": context.request_id,

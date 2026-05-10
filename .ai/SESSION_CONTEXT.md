@@ -2,9 +2,9 @@
 
 ## Current assumptions
 
-* Telemetry ingestion/storage/analytics stack is now present and passive.
-* Router/orchestrator/retry/fallback/execution modules expose optional telemetry hooks only.
-* No telemetry-driven routing behavior is enabled yet.
+* Session/state persistence is now implemented with pluggable store abstraction (`InMemory` + `SQLite`).
+* Execution lifecycle/retry/fallback/orchestrator/telemetry expose persistence hooks without ownership inversion.
+* Recovery coordinator can restore executable plans from persisted snapshots.
 
 ## Current blockers
 
@@ -12,5 +12,5 @@
 
 ## Temporary reasoning
 
-* Kept telemetry architecture separated into ingestion (`TelemetryManager`), persistence abstraction (`TelemetryStorage`), and aggregation (`ExecutionAnalyticsEngine`).
-* Avoided hard control coupling: telemetry observes lifecycle transitions but does not mutate routing/execution behavior.
+* Kept persistence passive and state-oriented: sessions observe lifecycle transitions and snapshots but do not own routing/retry logic.
+* Preserved separation between telemetry and persistence while allowing telemetry-reference attachment via hooks.

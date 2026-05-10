@@ -31,10 +31,13 @@
 ## Phase 6 — Observability
 
 1. Telemetry + metrics + execution analytics
-2. Session persistence integration hooks
 
-## Phase 7 — Product Surface
+## Phase 7 — Stateful Execution
 
-1. Streaming engine polish
-2. CLI layer
-3. Integration layer
+1. Session persistence + continuity management
+2. Stream recovery polish
+
+## Phase 8 — Product Surface
+
+1. CLI layer
+2. Integration layer

@@ -24,12 +24,28 @@ class TelemetryManager:
         *,
         storage: TelemetryStorage | None = None,
         analytics_engine: ExecutionAnalyticsEngine | None = None,
+        session_hook: TelemetryHook | None = None,
     ) -> None:
         self._storage = storage or InMemoryTelemetryStorage()
         self._analytics = analytics_engine or ExecutionAnalyticsEngine()
+        self._session_hook = session_hook
 
     async def record(self, event: TelemetryEvent) -> None:
         await self._storage.write_event(event)
+        await maybe_emit(
+            self._session_hook,
+            {
+                "event_type": event.event_type,
+                "request_id": event.request_id,
+                "session_id": event.session_id,
+                "provider": event.provider,
+                "model": event.model,
+                "retry_count": event.retry_count,
+                "fallback_count": event.fallback_count,
+                "execution_state": event.execution_state or "execution_running",
+                "metadata": {"telemetry_reference": f\"{event.event_type}:{event.request_id or 'na'}\"},
+            },
+        )
         logger.info(
             "telemetry_event_recorded",
             extra={
