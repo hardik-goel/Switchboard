@@ -15,6 +15,11 @@ class ModelConfig(BaseModel):
     reasoning_tier: str = Field(min_length=1)
     cost_per_1k_input: float = Field(ge=0.0)
     cost_per_1k_output: float = Field(ge=0.0)
+    context_window: int = Field(default=128000, ge=1)
+    speed_class: str = Field(default="balanced", min_length=1)
+    streaming_support: bool = True
+    tool_support: bool = False
+    capabilities: list[str] = Field(default_factory=list)
 
 
 class ProviderConfig(BaseModel):
@@ -32,6 +37,8 @@ class RoutingPolicyConfig(BaseModel):
     default_provider: str = Field(min_length=1)
     fallback_order: list[str] = Field(default_factory=list)
     max_cost_per_request: float | None = Field(default=None, ge=0.0)
+    prioritize_latency: bool = False
+    prioritize_cost: bool = False
 
 
 class AppConfig(BaseModel):

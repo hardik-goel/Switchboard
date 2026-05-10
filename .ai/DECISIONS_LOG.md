@@ -89,3 +89,14 @@ Provides explainable, provider-agnostic, routing-agnostic intelligence now while
 
 Impact:
 Routing engine can consume structured `PromptClassification` directly without parsing raw prompts.
+
+### 2026-05-10: Routing engine uses layered deterministic policy evaluation
+
+Decision:
+Implement routing as composition of policy modules (`CapabilityMatcher`, `CostOptimizer`, `LatencyOptimizer`, `ProviderHealthSelector`, `FallbackPlanner`) coordinated by `RoutingPolicyEvaluator` and `RoutingEngine`.
+
+Reason:
+Ensures routing remains deterministic, explainable, observable, config-driven, and fully decoupled from provider SDK/runtime/CLI logic.
+
+Impact:
+Routing decisions are now structured and execution-ready (`RoutingDecision`) with confidence, cost/latency estimates, and fallback chains.

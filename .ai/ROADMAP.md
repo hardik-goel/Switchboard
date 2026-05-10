@@ -19,15 +19,19 @@
 ## Phase 3 — Intelligence Layer
 
 1. Prompt analyzer + complexity classifier
-2. Routing engine integration with analyzer outputs
 
-## Phase 4 — Runtime Execution
+## Phase 4 — Routing Intelligence
+
+1. Routing engine + policy system
+2. Router-to-orchestrator execution request mapping integration
+
+## Phase 5 — Runtime Execution
 
 1. Provider orchestrator + execution pipeline
 2. Retry/fallback engine integration
 3. Session/telemetry integration hooks
 
-## Phase 5 — Product Surface
+## Phase 6 — Product Surface
 
 1. Streaming engine polish
 2. CLI layer

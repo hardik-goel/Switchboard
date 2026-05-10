@@ -11,10 +11,10 @@
 * [x] Anthropic provider
 * [x] Provider orchestrator runtime pipeline
 * [x] Prompt analyzer
+* [x] Routing engine
 * [ ] Provider abstraction
 * [ ] Gemini provider
 * [ ] Ollama provider
-* [ ] Routing engine
 * [ ] Telemetry
 * [ ] Session persistence
 * [ ] Streaming engine

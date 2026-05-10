@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Protocol, runtime_checkable
 
+from smart_router.core.router.schemas import ProviderHealthMetadata, RouterRuntimeContext
 from smart_router.schemas.classification import PromptClassification
 from smart_router.schemas.prompt import PromptRequest
 from smart_router.schemas.routing import RoutingDecision
@@ -17,5 +18,8 @@ class RoutingEngine(Protocol):
         self,
         request: PromptRequest,
         classification: PromptClassification,
+        *,
+        runtime_context: RouterRuntimeContext | None = None,
+        provider_health: ProviderHealthMetadata | None = None,
     ) -> RoutingDecision:
         """Choose provider/model using config + policy + telemetry."""

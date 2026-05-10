@@ -2,9 +2,9 @@
 
 ## Current assumptions
 
-* Prompt analyzer + deterministic classifier stack is now implemented in `core/analyzer` and `core/classifier`.
-* Analyzer outputs are provider-agnostic and routing-ready via structured `PromptClassification` schema.
-* Runtime/orchestration modules remain decoupled from analysis logic.
+* Routing engine now consumes only `PromptClassification` + config/runtime metadata and emits structured `RoutingDecision`.
+* Routing policies are deterministic, config-driven, and provider-SDK agnostic.
+* Analyzer, router, and orchestrator remain separated by explicit schemas/contracts.
 
 ## Current blockers
 
@@ -12,5 +12,5 @@
 
 ## Temporary reasoning
 
-* Kept heuristics deterministic and modular for future ML-pluggable classifier replacement.
-* Preserved strict separation: analyzer performs semantic intelligence only, with no routing/provider/pricing logic.
+* Implemented policy layer composition (`capability`, `cost`, `latency`, `health`) for explainable deterministic scoring.
+* Added fallback planning from ranked candidates without hardcoding provider names in routing logic.

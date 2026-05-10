@@ -12,5 +12,5 @@ After completion:
 
 1. Create Gemini provider
 2. Create Ollama provider
-3. Create routing engine
-4. Integrate routing engine with prompt analyzer outputs
+3. Integrate routing engine with orchestrator execution request mapping
+4. Add retry/fallback engine integration

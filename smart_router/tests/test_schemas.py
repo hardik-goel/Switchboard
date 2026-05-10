@@ -32,7 +32,17 @@ def test_classification_score_bounds() -> None:
         )
 
 
-def test_routing_decision_requires_provider_model_reason() -> None:
-    decision = RoutingDecision(provider="openai", model="gpt-5.4", reason="latency")
-    assert decision.provider == "openai"
-    assert decision.model == "gpt-5.4"
+def test_routing_decision_requires_structured_fields() -> None:
+    decision = RoutingDecision(
+        selected_provider="openai",
+        selected_model="gpt-5.4",
+        reasoning_summary="selected due to latency",
+        fallback_chain=["anthropic:claude-sonnet"],
+        estimated_cost=0.12,
+        estimated_latency=1800.0,
+        routing_confidence=0.82,
+        selected_capabilities=["code_editing"],
+        execution_strategy="standard",
+    )
+    assert decision.selected_provider == "openai"
+    assert decision.selected_model == "gpt-5.4"
