@@ -1,0 +1,146 @@
+# DECISIONS LOG
+
+## Architectural Decisions
+
+### 2026-05-10: Use package root `smart_router/` for all modules
+
+Decision:
+Initialize a single Python package (`smart_router`) with subpackages aligned to architecture domains (`cli`, `core`, `providers`, `schemas`, `tests`).
+
+Reason:
+Preserves strict modularity and keeps imports explicit and testable from the start.
+
+Impact:
+Future modules can be added without restructuring paths or introducing hidden coupling.
+
+### 2026-05-10: Define contracts as runtime-checkable protocols
+
+Decision:
+Define core interfaces in `core/interfaces` using `typing.Protocol` with async method signatures.
+
+Reason:
+Enforces provider-agnostic design and supports independent adapter implementations.
+
+Impact:
+Routing/orchestration modules can depend on contracts only, not provider internals.
+
+### 2026-05-10: Centralize config loading behind ConfigEngine
+
+Decision:
+Use a single typed `ConfigEngine` (`core/config/engine.py`) to load and validate YAML into `AppConfig`.
+
+Reason:
+Keeps config-driven design explicit and prevents ad-hoc YAML parsing across modules.
+
+Impact:
+Routing, providers, and orchestration will consume normalized typed config only.
+
+### 2026-05-10: Introduce ProviderRegistry with factory registration
+
+Decision:
+Provider adapter instantiation is routed through a `ProviderRegistry` that stores named factories.
+
+Reason:
+Avoids hidden dependencies and allows pluggable providers/future extensions without changing orchestration code.
+
+Impact:
+Provider orchestration can resolve adapters by provider name deterministically.
+
+### 2026-05-10: OpenAI provider is canonical adapter pattern
+
+Decision:
+Implement `smart_router/providers/openai` as the reference provider with strict isolation, typed config validation, typed exceptions, normalized streaming events, and retry-safe request handling.
+
+Reason:
+Future providers need a production-grade template that enforces abstraction boundaries and consistent behavior.
+
+Impact:
+Anthropic/Gemini/Ollama adapters can mirror the same architecture with minimal risk of interface drift.
+
+### 2026-05-10: Runtime orchestration is split across orchestrator/runtime/streaming modules
+
+Decision:
+Implement runtime execution as three focused layers: `RuntimeExecutionContext` for execution state, `ProviderOrchestrator` for lifecycle + provider invocation, and `StreamManager` for provider-agnostic stream normalization.
+
+Reason:
+Keeps responsibilities isolated, avoids routing leakage, and enables future telemetry/session/retry integration without redesign.
+
+Impact:
+Execution pipeline is now a stable foundation that can consume routing decisions later while remaining provider-agnostic.
+
+### 2026-05-10: Anthropic provider validated abstraction heterogeneity
+
+Decision:
+Implement `smart_router/providers/anthropic` with Anthropic-specific request/response/stream semantics, typed errors, env/config validation, and runtime-compatible normalized stream chunks.
+
+Reason:
+Stress-test that provider abstraction and runtime execution are truly provider-agnostic rather than OpenAI-shaped.
+
+Impact:
+Orchestrator and StreamManager can execute Anthropic flows without any core-layer changes, confirming abstraction integrity.
+
+### 2026-05-10: Prompt analysis uses deterministic modular heuristic components
+
+Decision:
+Implement analysis as modular heuristics (`TaskTypeDetector`, `RepoScopeAnalyzer`, `ComplexityClassifier`, `TokenEstimator`, `LatencySensitivityAnalyzer`) orchestrated by `PromptAnalyzer`.
+
+Reason:
+Provides explainable, provider-agnostic, routing-agnostic intelligence now while keeping a clean seam for future ML classifier pluggability.
+
+Impact:
+Routing engine can consume structured `PromptClassification` directly without parsing raw prompts.
+
+### 2026-05-10: Routing engine uses layered deterministic policy evaluation
+
+Decision:
+Implement routing as composition of policy modules (`CapabilityMatcher`, `CostOptimizer`, `LatencyOptimizer`, `ProviderHealthSelector`, `FallbackPlanner`) coordinated by `RoutingPolicyEvaluator` and `RoutingEngine`.
+
+Reason:
+Ensures routing remains deterministic, explainable, observable, config-driven, and fully decoupled from provider SDK/runtime/CLI logic.
+
+Impact:
+Routing decisions are now structured and execution-ready (`RoutingDecision`) with confidence, cost/latency estimates, and fallback chains.
+
+### 2026-05-10: Execution integration externalizes retries and fallbacks from orchestrator/providers
+
+Decision:
+Introduce `ExecutionPlanner`, `RouteExecutionMapper`, `RetryEngine`, `FailureClassifier`, `RetryPolicyEvaluator`, `FallbackExecutionManager`, and `ExecutionLifecycleManager` as provider-agnostic coordination layers.
+
+Reason:
+Transforms routing outputs into executable plans while preserving clean router/orchestrator/provider boundaries and deterministic retry/failover behavior.
+
+Impact:
+System now supports coordinated retry/fallback lifecycle with state tracking and failover context preservation without mutating routing logic.
+
+### 2026-05-10: Observability split into ingestion, storage abstraction, and analytics layers
+
+Decision:
+Implement passive telemetry as separate modules: `TelemetryManager` for ingestion, `TelemetryStorage` abstraction (`InMemory` + `SQLite`), metrics trackers, and `ExecutionAnalyticsEngine` aggregations.
+
+Reason:
+Prevents coupling telemetry with routing/execution control flow while enabling future telemetry-backed intelligence consumption.
+
+Impact:
+System now records operational signals and computes analytics (latency, cost, reliability, fallback/retry frequencies, degraded providers) without owning decisions.
+
+### 2026-05-10: Stateful execution uses hook-based persistence with recoverable snapshots
+
+Decision:
+Implement `SessionStore` abstraction, `SessionPersistenceEngine`, `SessionManager`, `SessionLifecycleManager`, `ExecutionStateStore`, `ContextSnapshotManager`, and `RecoveryCoordinator`; integrate via optional persistence hooks from lifecycle/retry/fallback/orchestrator/telemetry modules.
+
+Reason:
+Adds resumability and restart-safe continuity while preserving strict separation of concerns (sessions observe and persist state, but do not own routing/retry/provider logic).
+
+Impact:
+Execution sessions now survive interruption with persisted transitions/snapshots and can restore execution plans for recovery flows.
+
+### 2026-05-10: Production CLI remains orchestration-only with composed service bootstrap
+
+Decision:
+Implement CLI as thin composition/wiring layer (`cli/bootstrap.py`) with command modules delegating to analyzer/router/execution/orchestrator/session/telemetry primitives.
+
+Reason:
+Delivers usable end-to-end UX while preserving architecture boundaries and avoiding logic leakage into CLI.
+
+Impact:
+Local users can run prompts, interactive sessions, route explanations, resume sessions, inspect telemetry, validate config, and check provider health through one CLI surface.

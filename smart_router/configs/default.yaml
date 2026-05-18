@@ -1,0 +1,43 @@
+providers:
+  openai:
+    enabled: true
+    settings:
+      timeout_seconds: 30
+      max_retries: 2
+    models:
+      - name: gpt-5.4
+        max_input_tokens: 128000
+        max_output_tokens: 16384
+        latency_tier: medium
+        reasoning_tier: high
+        context_window: 128000
+        speed_class: balanced
+        streaming_support: true
+        tool_support: true
+        capabilities: [code_generation, code_editing, long_context_reasoning, repo_search]
+        cost_per_1k_input: 0.01
+        cost_per_1k_output: 0.03
+  anthropic:
+    enabled: true
+    settings:
+      timeout_seconds: 30
+      max_retries: 2
+    models:
+      - name: claude-sonnet
+        max_input_tokens: 200000
+        max_output_tokens: 8192
+        latency_tier: medium
+        reasoning_tier: high
+        context_window: 200000
+        speed_class: medium
+        streaming_support: true
+        tool_support: true
+        capabilities: [code_generation, code_editing, long_context_reasoning, planning, repo_search]
+        cost_per_1k_input: 0.009
+        cost_per_1k_output: 0.03
+routing:
+  default_provider: openai
+  fallback_order: [anthropic]
+  max_cost_per_request: 2.0
+  prioritize_latency: false
+  prioritize_cost: false
