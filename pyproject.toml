@@ -17,6 +17,7 @@ dependencies = [
 
 [project.scripts]
 smart-router = "smart_router.cli.main:app"
+switchboard = "smart_router.cli.main:app"
 
 [project.optional-dependencies]
 dev = [
@@ -26,7 +27,7 @@ dev = [
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
-testpaths = ["smart_router/tests"]
+testpaths = ["smart_router/tests", "tests"]
 
 [tool.setuptools.packages.find]
 include = ["smart_router*"]

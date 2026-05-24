@@ -1,0 +1,3 @@
+[console_scripts]
+smart-router = smart_router.cli.main:app
+switchboard = smart_router.cli.main:app

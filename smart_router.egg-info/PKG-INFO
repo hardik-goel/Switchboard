@@ -1,3 +1,19 @@
+Metadata-Version: 2.4
+Name: smart-router
+Version: 0.1.0
+Summary: Production-grade modular AI routing/orchestration CLI
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: typer>=0.12.0
+Requires-Dist: pydantic>=2.7.0
+Requires-Dist: PyYAML>=6.0.1
+Requires-Dist: httpx>=0.27.0
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.23.0; extra == "dev"
+Dynamic: license-file
+
 # Switchboard
 
 Developer-first AI routing CLI for coding workflows.
