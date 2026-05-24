@@ -1,5 +1,10 @@
 # Switchboard
 
+![Python](https://img.shields.io/badge/python-3.11%2B-blue)
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
+![Status](https://img.shields.io/badge/status-active%20development-orange)
+![CLI](https://img.shields.io/badge/interface-CLI-informational)
+
 Developer-first AI routing CLI for coding workflows.
 
 Switchboard is a local CLI that analyzes prompts, selects a provider route, executes with retries/fallbacks, and stores telemetry/session state locally. It is designed for engineers who want explicit routing decisions and reproducible execution behavior.
@@ -127,7 +132,7 @@ Configuration controls include:
 ## Testing
 
 ```bash
-pip install -e .[dev]
+pip install -e '.[dev]'
 python3 -m pytest -q
 ```
 
@@ -159,3 +164,8 @@ Basic flow:
 ## License
 
 MIT
+
+## Connect & Support
+
+- [![LinkedIn](https://img.shields.io/badge/LinkedIn-Hardik%20Goel-0A66C2?logo=linkedin&logoColor=white)](https://www.linkedin.com/in/hardik-goel-a6334936/)
+- [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-HardikGoel-FFDD00?logo=buymeacoffee&logoColor=000000)](https://buymeacoffee.com/HardikGoel)
