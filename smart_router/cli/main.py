@@ -45,6 +45,13 @@ def run_command(prompt: str, session_id: str | None = None, stream: bool = True)
     asyncio.run(run_once(services, prompt=prompt, session_id=session_id, stream=stream))
 
 
+@app.command("ask")
+def ask_command(prompt: str, session_id: str | None = None, stream: bool = True) -> None:
+    """Alias for run; keeps CLI ergonomics aligned with README language."""
+    services = _services()
+    asyncio.run(run_once(services, prompt=prompt, session_id=session_id, stream=stream))
+
+
 @app.command("interactive")
 def interactive_command() -> None:
     """Run interactive prompt loop."""
@@ -62,6 +69,13 @@ def resume_command(session_id: str) -> None:
 @routes_app.command("explain")
 def routes_explain(prompt: str) -> None:
     """Explain route selection for a prompt without executing it."""
+    services = _services()
+    asyncio.run(explain_route(services, prompt))
+
+
+@app.command("explain")
+def explain_command(prompt: str) -> None:
+    """Top-level alias for route explanation."""
     services = _services()
     asyncio.run(explain_route(services, prompt))
 

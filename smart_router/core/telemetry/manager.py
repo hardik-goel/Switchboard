@@ -43,7 +43,7 @@ class TelemetryManager:
                 "retry_count": event.retry_count,
                 "fallback_count": event.fallback_count,
                 "execution_state": event.execution_state or "execution_running",
-                "metadata": {"telemetry_reference": f\"{event.event_type}:{event.request_id or 'na'}\"},
+                "metadata": {"telemetry_reference": f"{event.event_type}:{event.request_id or 'na'}"},
             },
         )
         logger.info(
